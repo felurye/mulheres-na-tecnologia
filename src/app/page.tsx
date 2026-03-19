@@ -1,13 +1,13 @@
 import { Hero } from "@/components/Hero";
 import { Community } from "@/components/Community";
 import { Footer } from "@/components/Footer";
-import { DynamicContent } from "@/components/DynamicContent";
+import { HomeSections } from "@/components/HomeSections";
 
 export default function Home() {
   return (
     <>
       <Hero />
-      <DynamicContent />
+      <HomeSections />
       <Community />
       <Footer />
     </>

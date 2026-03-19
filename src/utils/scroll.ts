@@ -1,6 +1,6 @@
 export const handleBackToTopVisibility = (
   button: HTMLElement,
-  threshold = 300,
+  threshold = 300
 ): void => {
   if (window.scrollY > threshold) {
     button.classList.add("show");

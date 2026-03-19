@@ -17,9 +17,11 @@ export const ContentSection = ({ section }: ContentSectionProps) => {
       id={htmlAttributes.idSection}
       className={htmlAttributes.classNameSection}
     >
-      <div className="section-main-title">
-        <h2 dangerouslySetInnerHTML={{ __html: title }} />
-      </div>
+      {title && (
+        <div className="section-main-title">
+          <h2 dangerouslySetInnerHTML={{ __html: title }} />
+        </div>
+      )}
 
       <div className={htmlAttributes.classNameList}>
         {items.map((item, index) =>
@@ -35,7 +37,7 @@ export const ContentSection = ({ section }: ContentSectionProps) => {
               item={item}
               className={htmlAttributes.classNameLink}
             />
-          ),
+          )
         )}
       </div>
     </section>
