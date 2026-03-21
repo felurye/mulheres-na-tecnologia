@@ -191,10 +191,27 @@ npm run dev
 src/
 ├── app/                    # Rotas e layout (Next.js App Router)
 │   ├── layout.tsx         # Layout raiz com metadata
-│   └── page.tsx           # Página principal
+│   ├── page.tsx           # Página principal - usa componentes de Contents
+│   ├── artigos/
+│   │   └── page.tsx       # Página de artigos - renderiza <Articles />
+│   ├── livros/
+│   │   └── page.tsx       # Página de livros - renderiza <Books />
+│   ├── canais-youtube/
+│   │   └── page.tsx       # Página de canais - renderiza <YouTubeChannels />
+│   ├── videos/
+│   │   └── page.tsx       # Página de vídeos - renderiza <Videos />
+│   ├── comunidades/
+│   │   └── page.tsx       # Página de comunidades - renderiza <Communities />
+│   ├── artigos-comunidades/
+│   │   └── page.tsx       # Página de artigos de comunidades - renderiza <CommunityArticles />
+│   ├── instagram/
+│   │   └── page.tsx       # Página de Instagram - renderiza <Instagram />
+│   └── sessoes/
+│       └── page.tsx       # Hub de navegação das seções
 ├── components/            # Componentes React reutilizáveis
 │   ├── Hero.tsx          # Seção hero
-│   ├── DynamicContent.tsx # Carrega conteúdo de JSON
+│   ├── Contents.tsx       # Componentes para cada seção (Articles, Books, Videos, etc.)
+│   ├── SectionPage.tsx    # Layout wrapper para páginas de seção
 │   ├── ContentSection.tsx # Renderiza seções de cards
 │   ├── ContentCard.tsx    # Card individual
 │   ├── RoundCard.tsx      # Card redondo (avatares)
@@ -203,7 +220,11 @@ src/
 │   ├── Community.tsx      # Seção de comunidade
 │   └── Footer.tsx         # Rodapé
 ├── types/                 # Tipos TypeScript
-│   └── content.ts        # Interfaces de conteúdo
+│   └── content.ts         # Interfaces de conteúdo
+├── lib/                   # Bibliotecas e utilitários server-side
+│   └── content.ts         # Funções para ler arquivos de conteúdo
+├── data/                  # Dados e configurações
+│   └── contentSections.ts # Mapeamento de seções e rotas
 ├── utils/                 # Funções auxiliares
 │   ├── theme.ts          # Gerenciamento de tema
 │   ├── scroll.ts         # Utilitários de scroll
@@ -212,9 +233,59 @@ src/
     └── globals.css       # CSS com design tokens
 
 public/
-├── content.json          # Dados de conteúdo
+├── content/              # Arquivos de conteúdo organizados
+│   ├── articles.json
+│   ├── books.json
+│   ├── youtube-channels.json
+│   ├── videos.json
+│   ├── communities.json
+│   ├── community-articles.json
+│   └── instagram.json
 └── images/               # Imagens organizadas por categoria
+    ├── articles/
+    ├── books/
+    ├── channels/
+    ├── videos/
+    ├── communities/
+    └── social/
 ```
+
+#### Padrão de Arquitetura
+
+O projeto segue um padrão de **composição de componentes** para clareza e reusabilidade:
+
+1. **Seções de conteúdo** são definidas em `src/components/Contents.tsx` como componentes async
+2. **Páginas** (`src/app/*/page.tsx`) importam componentes de Contents e os renderizam dentro de `SectionPage`
+3. **SectionPage** é um componente de layout puro que recebe `children` e renderiza navegação + footer
+
+**Exemplo prático:**
+
+```tsx
+// src/app/artigos/page.tsx
+import { SectionPage } from "@/components/SectionPage";
+import { Articles } from "@/components/Contents";
+
+export default async function ArtigosPage() {
+  return (
+    <SectionPage>
+      <Articles />
+    </SectionPage>
+  );
+}
+```
+
+O componente `Articles` em `Contents.tsx`:
+
+- Lê dados do arquivo `articles.json`
+- Renderiza `ContentSection` com os dados processados
+- É reutilizável em qualquer página ou contexto
+
+**Benefícios:**
+
+- ✅ Sem duplicação de lógica de dados
+- ✅ Componentes reutilizáveis
+- ✅ Separação clara: rotas/layout vs. conteúdo
+- ✅ Fácil adicionar novas seções
 
 ### Tipos de contribuição de desenvolvimento
 
@@ -247,6 +318,105 @@ public/
 
 ### Boas práticas de desenvolvimento
 
+#### Como adicionar uma nova seção de conteúdo
+
+Se você quer adicionar uma nova categoria de conteúdo (ex: "Podcasts"), siga este padrão:
+
+**1. Crie o arquivo de dados** (`public/content/podcasts.json`)
+
+```json
+{
+  "title": "Podcasts",
+  "htmlAttributes": {
+    "idSection": "podcasts",
+    "classNameSection": "container content-section",
+    "classNameList": "content-list",
+    "classNameLink": "card-link"
+  },
+  "items": [
+    {
+      "id": "podcast-mulheres-tech",
+      "title": "Mulheres na Tech",
+      "description": "Podcast sobre histórias e experiências de mulheres na tecnologia",
+      "author": "Ana e Maria",
+      "link": "https://exemplo.com/podcast",
+      "imageSrc": "/images/podcasts/mulheres-tech.jpg",
+      "imageAlt": "Logo do Podcast Mulheres na Tech",
+      "type": "podcast",
+      "tags": ["podcast", "experiências", "carreira"]
+    }
+  ]
+}
+```
+
+**2. Adicione o componente em `src/components/Contents.tsx`**
+
+```typescript
+export async function Podcasts() {
+  const section = await readContentSection("podcasts.json");
+  return (
+    <ContentSection
+      section={{ ...section, title: section.title || "Podcasts" }}
+    />
+  );
+}
+```
+
+**3. Configure a rota em `src/data/contentSections.ts`**
+
+```typescript
+export const CONTENT_SECTION_FILES = [
+  // ... seções existentes
+  {
+    fileName: "podcasts.json",
+    title: "Podcasts",
+    slug: "podcasts",
+    path: "/podcasts",
+  },
+];
+```
+
+**4. Crie a página em `src/app/podcasts/page.tsx`**
+
+```typescript
+import { SectionPage } from "@/components/SectionPage";
+import { Podcasts } from "@/components/Contents";
+
+export default async function PodcastsPage() {
+  return (
+    <SectionPage>
+      <Podcasts />
+    </SectionPage>
+  );
+}
+```
+
+**5. Adicione o link em `src/app/sessoes/page.tsx`** (se quiser na seção de navegação)
+
+```typescript
+<Link href="/podcasts" className="section-link">
+  <h3>Podcasts</h3>
+  <p>Ouça histórias de mulheres na tecnologia</p>
+</Link>
+```
+
+**6. (Opcional) Adicione na homepage** em `src/app/page.tsx`
+
+```typescript
+import { Podcasts } from "@/components/Contents";
+
+// Em Home(), adicione:
+<Podcasts />
+```
+
+**Padrão em resumo:**
+
+1. JSON file com dados
+2. Componente async em Contents.tsx
+3. Registro em contentSections.ts
+4. Página route em src/app/[nomeSecao]/page.tsx
+5. (Opcional) Link em navegação ou homepage
+
 #### Código
 
 - ✅ Use **TypeScript** em todas as novas funcionalidades
@@ -255,6 +425,45 @@ public/
 - ✅ Mantenha componentes **pequenos e focados**
 - ✅ Use **tipos explícitos** ao invés de `any`
 - ✅ Adicione **comentários** em lógica complexa
+- ✅ **Componentes de conteúdo** devem estar em `Contents.tsx`, não em pages
+- ✅ **Pages** devem ser leves - apenas importar e composicionar componentes
+
+**Padrão correto para páginas de seção:**
+
+```typescript
+// ✅ BOM - página focada em composição
+import { SectionPage } from "@/components/SectionPage";
+import { Articles } from "@/components/Contents";
+
+export default async function ArtigosPage() {
+  return (
+    <SectionPage>
+      <Articles />
+    </SectionPage>
+  );
+}
+```
+
+```typescript
+// ❌ EVITE - lógica de dados na página
+import { readContentSection } from "@/lib/content";
+import { ContentSection } from "@/components/ContentSection";
+
+export default async function ArtigosPage() {
+  const section = await readContentSection("articles.json");
+  return (
+    <SectionPage>
+      <ContentSection section={section} />
+    </SectionPage>
+  );
+}
+```
+
+**Rationale**:
+
+- Componentes de conteúdo em `Contents.tsx` podem ser reutilizados (homepage, novas pages, etc.)
+- Pages ficam simples e legíveis
+- Sem duplicação de lógica de data fetching
 
 #### Commits
 
