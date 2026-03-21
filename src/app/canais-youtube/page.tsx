@@ -1,10 +1,10 @@
 import { SectionPage } from "@/components/SectionPage";
+import { YouTubeChannels } from "@/components/Contents";
 
 export default async function CanaisYoutubePage() {
   return (
-    <SectionPage
-      fileName="youtube-channels.json"
-      fallbackTitle="Canais do YouTube"
-    />
+    <SectionPage>
+      <YouTubeChannels />
+    </SectionPage>
   );
 }

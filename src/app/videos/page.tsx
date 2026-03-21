@@ -1,5 +1,10 @@
 import { SectionPage } from "@/components/SectionPage";
+import { Videos } from "@/components/Contents";
 
 export default async function VideosPage() {
-  return <SectionPage fileName="videos.json" fallbackTitle="Vídeos" />;
+  return (
+    <SectionPage>
+      <Videos />
+    </SectionPage>
+  );
 }

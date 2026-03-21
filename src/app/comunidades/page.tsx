@@ -1,7 +1,10 @@
 import { SectionPage } from "@/components/SectionPage";
+import { Communities } from "@/components/Contents";
 
 export default async function ComunidadesPage() {
   return (
-    <SectionPage fileName="communities.json" fallbackTitle="Comunidades" />
+    <SectionPage>
+      <Communities />
+    </SectionPage>
   );
 }

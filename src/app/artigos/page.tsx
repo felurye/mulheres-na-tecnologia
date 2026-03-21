@@ -1,5 +1,10 @@
 import { SectionPage } from "@/components/SectionPage";
+import { Articles } from "@/components/Contents";
 
 export default async function ArtigosPage() {
-  return <SectionPage fileName="articles.json" fallbackTitle="Artigos" />;
+  return (
+    <SectionPage>
+      <Articles />
+    </SectionPage>
+  );
 }

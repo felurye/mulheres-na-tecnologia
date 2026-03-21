@@ -1,19 +1,12 @@
 import Link from "next/link";
-import { ContentSection } from "./ContentSection";
 import { Footer } from "./Footer";
-import { readContentSection } from "@/lib/content";
+import { ReactNode } from "react";
 
 interface SectionPageProps {
-  fileName: string;
-  fallbackTitle: string;
+  children: ReactNode;
 }
 
-export const SectionPage = async ({
-  fileName,
-  fallbackTitle,
-}: SectionPageProps) => {
-  const section = await readContentSection(fileName);
-
+export const SectionPage = ({ children }: SectionPageProps) => {
   return (
     <>
       <section className="content-section container">
@@ -21,9 +14,7 @@ export const SectionPage = async ({
           Voltar para sessões
         </Link>
       </section>
-      <ContentSection
-        section={{ ...section, title: section.title || fallbackTitle }}
-      />
+      {children}
       <Footer />
     </>
   );
