@@ -1,4 +1,5 @@
 import { CardItem } from "@/types/content";
+import { resolveImagePath } from "@/lib/paths";
 
 interface RoundCardProps {
   item: CardItem;
@@ -16,7 +17,7 @@ const RoundCard = ({ item }: RoundCardProps) => {
       <div className="round-image">
         {item.cardImage && (
           <img
-            src={item.cardImage.imageSrc}
+            src={resolveImagePath(item.cardImage.imageSrc)}
             alt={item.cardImage.imageAlt}
             loading="lazy"
           />

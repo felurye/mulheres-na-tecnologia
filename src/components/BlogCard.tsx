@@ -1,4 +1,5 @@
 import { CardItem } from "@/types/content";
+import { resolveImagePath } from "@/lib/paths";
 
 interface BlogCardProps {
   item: CardItem;
@@ -16,7 +17,7 @@ const BlogCard = ({ item }: BlogCardProps) => {
       <div className="placeholder">
         {item.cardImage && (
           <img
-            src={item.cardImage.imageSrc}
+            src={resolveImagePath(item.cardImage.imageSrc)}
             alt={item.cardImage.imageAlt}
             loading="lazy"
           />
